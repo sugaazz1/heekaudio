@@ -7,5 +7,53 @@
   </head>
   <body>
     {% include "components/navbar.html.jinja"%}
+
+        <!--<main class="flex flex-row grid gird-cols-3 gap-3">
+            {% for x in products %}
+                <div class="flex grid-cols-3">
+                    <img class="h-25 mx-auto" src="{{ x['Image'] }}">
+                    <br>
+                    {{x["Name"]}}
+                    ${{x["Price"]}}
+                    {# {{x["Image"]}} #}
+                    {{x["Category"]}}
+                    <br>
+
+                </div>
+            {% endfor %}
+        </main> -->
+
+        <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 p-5">
+            {% for x in products %}
+                <div class="bg-gray-500 rounded-xl shadow hover:shadow-lg transition p-2">
+                    
+                    <!-- Product Image -->
+                    <div class="w-45 aspect-square overflow-hidden rounded-lg">
+                        <img 
+                            src="{{ x['Image'] }}" 
+                            alt="{{ x['Name'] }}" 
+                            class="w-full h-full object-cover"
+                        >
+                    </div>
+
+                    <!-- Product Info -->
+                    <div class="mt-4 space-y-1">
+                        <h3 class="text-lg font-semibold text-gray-800 truncate">
+                            {{ x["Name"] }}
+                        </h3>
+
+                        <p class="text-xl font-bold text-gray-900">
+                            ${{ x["Price"] }}
+                        </p>
+
+                        <p class="text-sm text-gray-500">
+                            {{ x["Category"] }}
+                        </p>
+                    </div>
+
+                </div>
+            {% endfor %}
+        </main>
+
     </body>
 </html>
