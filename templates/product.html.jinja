@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+    <body>
+        {% include "components/navbar.html.jinja"%}
+
+        <div class="flex flex-row gap-8 p-5 mt-10 ">
+            <!-- Left: Product Image-->
+            <div class="w-150 aspect-square overflow-hidden rounded-lg">
+                <img 
+                    src= "{{ product ['Image'] }}" 
+                    alt= "{{ product ['Name'] }}"
+                    class="w-full h-full object-cover"
+                    >
+            </div>
+
+            <!--Right: Product Info-->
+            <div class="flex flex-col gap-6 max-w-xl">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 leading-snug">{{product["Name"]}}</h1>
+                </div>
+
+                <p class="text-gray-600 text-lg font-bold"> ${{ product["Price"]}}</p>
+
+                <div class="bg-gray-500 rounded-xl shadow p-4">
+                    <p class="font-bold text-2xl mb-1">Description</p>
+                    <p class="text-gray-700">{{product["Description"]}}</p>
+                </div>
+            </div>
+        </div>
+
+    </body>
+</html>
