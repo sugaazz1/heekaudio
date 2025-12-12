@@ -55,6 +55,28 @@ def product_page(product_id):
     
     return render_template("product.html.jinja", product=result)
 
-@app.route("/sign")
+
+#@app.route("cart/<product_id>", methods=["POST"])
+#def add_to_cart(product_id):
+
+    #return
+
+
+@app.route("/login")
+def login_page(login_id):
+    
+    connection = connect_db()
+
+    cursor = connection.cursor()
+
+    return render_template("login.html.jinja")
+
+
+
+@app.route("/register")
 def sign_in_page(user_id):
-    return render_template("sign_in.html.jinja")
+
+
+
+
+    return

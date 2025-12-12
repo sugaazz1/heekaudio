@@ -24,10 +24,10 @@
         </main> -->
         <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 p-5">
             {% for x in products %}
-                <a href="/product/{{x['ID']}}" class="bg-gray-500 rounded-xl shadow hover:shadow-lg transition p-2">
+                <a href="/product/{{x['ID']}}" class="bg-blue-100 rounded-xl shadow hover:shadow-lg transition p-2">
                     
                     <!-- Product Image -->
-                    <div class="w-45 aspect-square overflow-hidden rounded-lg">
+                    <div class="w-full aspect-square overflow-hidden rounded-lg">
                         <img 
                             src="{{ x['Image'] }}" 
                             alt="{{ x['Name'] }}" 
@@ -38,7 +38,7 @@
                     <!-- Product Info -->
                     <div class="mt-4 space-y-1">
 
-                        <h3 class="text-lg font-semibold text-gray-800 truncate">
+                        <h3 class="text-lg font-semibold text-gray-800 line-clamp-1">
                             {{ x["Name"] }}
                         </h3>
 
