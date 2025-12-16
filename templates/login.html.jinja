@@ -8,12 +8,20 @@
     <body>
         <div>
             
+            {% for message in get_flashed_messages()%}
+                <li>{{ message}} </li>
+            {% endfor%}
             
+          <form class="flex flex-col gap-2" method="post">
             
-            
-            <label class="label1"> First name: </label>
-            <input class="label2" required name="first_name"/>
-            
+            <label> Email </label>
+            <input required type="email" name="email">
+
+            <label> Password</label>
+            <input required type="password" name="password"> 
+
+            <button type="submit">Login</button>
+          </form>
         
         </div>
 

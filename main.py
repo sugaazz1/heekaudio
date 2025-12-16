@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, flash, redirect
-
+from flask_login import LoginManager, login_user
 from flask import flash
 import pymysql
 
@@ -11,6 +11,38 @@ app = Flask(__name__)
 config = Dynaconf(settings_file =["settings.toml"])
 
 app.secret_key = config.secret_key
+
+login_manager = LoginManager(app)
+
+class User:
+    is_authenticated = True
+    is_active = True
+    is_anonymous = False
+
+    def __init__(self, result):
+        self.name = result["Name"]
+        self.email = result["Email"]
+        self.address = result["Address"]
+        self.id = result["ID"]
+
+    def get_id(self):
+        return str(self.id)
+    
+
+@login_manager.user_loader  
+def load_user(user_id):
+    connection  = connect_db()
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT * FROM `User` WHERE `ID` = %s ", (user_id))
+
+    result = cursor.fetchone()
+    connection.close()
+    if result is None:
+        return None
+
+    
+    return User(result)
 
 
 def connect_db():
@@ -66,12 +98,30 @@ def product_page(product_id):
     #return
 
 
-@app.route("/login")
+@app.route("/login", methods=["POST","GET"])
 def login_page():
-    
-    connection = connect_db()
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
 
-    cursor = connection.cursor()
+
+        connection = connect_db()
+
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT * FROM `User`  WHERE `Email` = %s", (email))
+
+        result = cursor.fetchone()
+
+        connection.close()
+
+        if result is None:
+            flash("No user found")
+        elif password != result["Password"]:
+            flash("Incorrect Password")
+        else:
+            login_user(User(result))
+            return redirect("/browse")
 
     return render_template("login.html.jinja")
 
@@ -95,12 +145,17 @@ def register_page():
             connection = connect_db()
 
             cursor = connection.cursor()
-
-            cursor.execute("""
-                INSERT INTO `User` (`Name`, `Email`, `Password`,  `Address`)
-                VALUES (%s, %s, %s, %s)
-            """, (name, email, password, address))
-            return redirect("/login")
+            try:
+                cursor.execute("""
+                    INSERT INTO `User` (`Name`, `Email`, `Password`,  `Address`)
+                    VALUES (%s, %s, %s, %s)
+                """, (name, email, password, address))
+                connection.close()
+            except pymysql.err.IntegrityError:
+                flash("Email is already in use")
+                connection.close()
+            else:
+                return redirect("/login")
 
 
     return render_template("register.html.jinja")
