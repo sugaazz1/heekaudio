@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, flash, redirect
-from flask_login import LoginManager, login_user
+from flask_login import LoginManager, login_user, logout_user, login_required
 from flask import flash
 import pymysql
 
@@ -159,3 +159,12 @@ def register_page():
 
 
     return render_template("register.html.jinja")
+
+
+@app.route("/logout")
+def logout():
+
+    logout_user()
+    flash("You have been Logged Out")
+
+    return redirect("/")

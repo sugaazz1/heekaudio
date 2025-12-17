@@ -8,6 +8,8 @@
     <body>
         <div>
             
+            {% include "components/navbar.html.jinja"%}
+
             {% for message in get_flashed_messages()%}
                 <li>{{ message}} </li>
             {% endfor%}
