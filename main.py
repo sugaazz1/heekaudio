@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, flash, redirect, abort
-from flask_login import LoginManager, login_user, logout_user, login_required
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask import flash
 import pymysql
 
@@ -87,7 +87,10 @@ def product_page(product_id):
     
     cursor.execute("SELECT * FROM `Product` WHERE `ID` = %s", ( product_id) )
 
+
     result = cursor.fetchone()
+
+    #cursor.execute("SELECT * FROM `Product` WHERE ` Category` = %s AND `ID` != %s LIMIT 4", (result["Category"], product_id))
 
     connection.close()
     
@@ -96,11 +99,27 @@ def product_page(product_id):
 
     return render_template("product.html.jinja", product=result)
 
+@app.route("/product/<product_id>/add_to_cart", methods=["POST"])
+@login_required
+def add_to_cart(product_id):
 
-#@app.route("cart/<product_id>", methods=["POST"])
-#def add_to_cart(product_id):
+    quantity = request.form["quantity"]
 
-    #return
+
+    connection = connect_db()
+
+    cursor = connection.cursor()
+
+    cursor.execute("INSERT INTO `Cart` (`Quantity`, `ProductID`, `UserID`) VALUES (%s, %s, %s)" \
+    "ON DUPLICATE KEY UPDATE" \
+    "`Quantity` = `Quantity` + %s", (quantity, product_id, current_user.id, quantity))
+
+    result = cursor.fetchone()
+    
+    connection.close()
+
+
+    return redirect('/cart')
 
 
 @app.route("/login", methods=["POST","GET"])
@@ -129,7 +148,6 @@ def login_page():
             return redirect("/browse")
 
     return render_template("login.html.jinja")
-
 
 
 @app.route("/register", methods=["POST", "GET"])
@@ -174,3 +192,5 @@ def logout():
     flash("You have been Logged Out")
 
     return redirect("/")
+
+

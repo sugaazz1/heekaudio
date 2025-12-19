@@ -8,29 +8,57 @@
     <body>
         {% include "components/navbar.html.jinja"%}
 
-        <div class="flex flex-row gap-8 p-5 mt-10 ">
-            <!-- Left: Product Image-->
-            <div class="w-150 aspect-square overflow-hidden rounded-lg">
-                <img 
-                    src= "{{ product ['Image'] }}" 
-                    alt= "{{ product ['Name'] }}"
-                    class="w-full h-full object-cover"
-                    >
-            </div>
+        <div class="flex flex-row gap-10">
 
-            <!--Right: Product Info-->
-            <div class="flex flex-col gap-6 max-w-xl">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900 leading-snug">{{product["Name"]}}</h1>
+            <!--The products, the Description, the price and the cart at the top-->
+            <div class="flex flex-row gap-8 p-5 mt-10 ">
+                <!-- Left: Product Image-->
+                <div class="w-150 aspect-square overflow-hidden rounded-lg">
+                    <img 
+                        src= "{{ product ['Image'] }}" 
+                        alt= "{{ product ['Name'] }}"
+                        class="w-full h-full object-cover"
+                        >
                 </div>
 
-                <p class="text-gray-600 text-lg font-bold"> ${{ product["Price"]}}</p>
+                <!--Right: Product Info-->
+                <div class="flex flex-col gap-6 max-w-xl">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 leading-snug">{{product["Name"]}}</h1>
+                    </div>
 
-                <div class="bg-gray-500 rounded-xl shadow p-4">
-                    <p class="font-bold text-2xl mb-1">Description</p>
-                    <p class="text-gray-700">{{product["Description"]}}</p>
+                    <p class="text-gray-600 text-lg font-bold"> ${{ product["Price"]}}</p>
+
+                    <form method="post" action="/product/{{product['ID']}}/add_to_cart" >
+                        <label>Quantity:</label>
+                        <input type="number" name="quantity" value="1" min="1" max="">
+                            
+
+                        <button class="bg-red-2-500 ">Add to cart</button>
+                    </form>
+
+
+                    <div class="bg-gray-500 rounded-xl shadow p-4">
+                        <p class="font-bold text-2xl mb-1">Description</p>
+                        <p class="text-gray-700">
+                            {{ product["Description"] [150:]}}
+                            {% if product["Description"]| length > 150 %}
+                                <span id="dots">...</span>
+                                <span id="more" class="hidden">
+                                    {{product["Description"] [150:]}}
+                                </span>
+                            {%endif%}
+                        </p>
+                    </div>
                 </div>
             </div>
+
+            <div>
+            
+            </div>
+
+
+
         </div>
 
     </body>
