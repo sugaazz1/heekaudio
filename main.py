@@ -1,6 +1,5 @@
-from flask import Flask, render_template, request, flash, redirect, abort
+from flask import Flask, render_template, request, flash, redirect, abort, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from flask import flash
 import pymysql
 
 from dynaconf import Dynaconf
@@ -130,13 +129,10 @@ def login_page():
 
 
         connection = connect_db()
-
         cursor = connection.cursor()
 
         cursor.execute("SELECT * FROM `User`  WHERE `Email` = %s", (email))
-
         result = cursor.fetchone()
-
         connection.close()
 
         if result is None:
@@ -145,6 +141,11 @@ def login_page():
             flash("Incorrect Password")
         else:
             login_user(User(result))
+            
+            if "has_seen_greeting"  not in session:
+                session["has_seen_greeting"] = False
+            
+            
             return redirect("/browse")
 
     return render_template("login.html.jinja")
@@ -187,10 +188,29 @@ def register_page():
 @app.route("/logout")
 @login_required
 def logout():
-
+    session.pop("has_seen_greeting", None)
     logout_user()
     flash("You have been Logged Out")
 
     return redirect("/")
 
 
+
+@app.route("/cart")
+@login_required
+def cart():
+    connection = connect_db()
+
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT * FROM `Cart`
+        JOIN `Product` ON `Product`.`ID` = `Cart`. `ProductID`
+        WHERE `UserID` = %s;
+""", (current_user.id))
+    
+    results = cursor.fetchall()
+
+    connection.close()
+    
+    return render_template("cart.html.jinja", cart=results)
