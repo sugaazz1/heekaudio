@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, flash, redirect, abort, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import pymysql
-
 from dynaconf import Dynaconf
 
 
@@ -212,5 +211,41 @@ def cart():
     results = cursor.fetchall()
 
     connection.close()
-    
+
+    if len("/cart") == 0:
+        print("YOUR CART IS EMPTY, ADD A PRODUCT TO VIEW IT")
+
     return render_template("cart.html.jinja", cart=results)
+
+@app.route("/cart/<product_id>/update_quantity", methods=["POST"])
+@login_required
+def update_cart(product_id):
+    new_quantity = request.form['quantity']
+
+    connection = connect_db() 
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        UPDATE `Cart` 
+        SET `Quantity` = %s
+        WHERE `ProductID` = %s AND `UserID` = %s
+        
+""", (new_quantity, product_id, current_user.id ))
+    
+    connection.close()
+    return redirect('/cart')
+
+@app.route("/cart/<product_id>/delete", methods=["POST"])
+@login_required
+def delete_from_cart(product_id):
+    connection = connect_db()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        DELETE FROM `Cart`
+        WHERE `ProductID` = %s AND `UserID` = %s
+    """, (product_id, current_user.id))
+
+    connection.close()
+    return redirect("/cart")
+
