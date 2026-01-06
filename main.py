@@ -80,7 +80,6 @@ def browse():
 def product_page(product_id):
 
     connection = connect_db()
-
     cursor = connection.cursor()
     
     cursor.execute("SELECT * FROM `Product` WHERE `ID` = %s", ( product_id) )
@@ -213,8 +212,10 @@ def cart():
     connection.close()
 
     if len("/cart") == 0:
-        print("YOUR CART IS EMPTY, ADD A PRODUCT TO VIEW IT")
-
+        flash("YOUR CART IS EMPTY, ADD A PRODUCT TO VIEW IT")
+    else:
+        flash('...')
+        connection.close()
     return render_template("cart.html.jinja", cart=results)
 
 @app.route("/cart/<product_id>/update_quantity", methods=["POST"])
