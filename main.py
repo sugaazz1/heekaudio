@@ -211,8 +211,13 @@ def cart():
         
     connection.close()
 
+    subtotal = sum(
+        item["Price"] * item["Quantity"]
+        for item in results
+    )
+
         
-    return render_template("cart.html.jinja", cart=results)
+    return render_template("cart.html.jinja", cart=results, subtotal=subtotal)
 
 @app.route("/cart/<product_id>/update_quantity", methods=["POST"])
 @login_required
@@ -256,12 +261,17 @@ def checkout():
 
     cursor.execute("""
         SELECT * FROM `Cart`
-        JOIN `Product` ON `Product`.`ID` = `Cart`. `ProductID`
+        JOIN `Product` ON `Product`.`ID` = `Cart`.`ProductID`
         WHERE `UserID` = %s;
 """, (current_user.id))
     
     results = cursor.fetchall()
-            
+    
+    subtotal = sum(
+        item["Price"] * item["Quantity"]
+        for item in results
+    )
+
     if request.method == "POST":
         # Create the sale in the database
         cursor.execute("INSERT INTO `Sale` (`UserID`) VALUES (%s)", (current_user.id, ))
@@ -274,8 +284,12 @@ def checkout():
         cursor.execute("DELETE FROM `Cart` WHERE `UserID` = %s", (current_user.id,))
         # thank you screen
         #TODO: Make thank you page _ route
-        redirect("/thank-you")
+        return redirect("/thank-you")
         
     connection.close()
 
-    return render_template("checkout.html.jinja", cart=results)
+    return render_template("checkout.html.jinja", cart=results, subtotal=subtotal)
+
+@app.route("/thank-you")
+def thank_you():
+    return render_template("thank-you.html.jinja")

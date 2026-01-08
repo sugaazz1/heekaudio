@@ -42,7 +42,6 @@
                             </form>
                         </div>
 
-                        <div> {{ x ["Price"] * x ["Quantity"] }}</div>
 
                         <div> 
                         <form method="post" action="/cart/{{x ['ProductID'] }}/delete">
@@ -50,23 +49,33 @@
                         </form>
                         </div>
 
+                        <div class="font-bold"> ${{ x ["Price"] }}</div>
+
                     </div>
                 {%endfor%}
                 
-                
+                <span class="text-right text-xl">
+                    Subtotal:
+                    <p class="text-xl font-bold mt-1"> 
+                        ${{"%.2f"|format(subtotal)}}
+                    </p>
+                </span>
             </div >
 
                 <div class="w-150 p-5 bg-blue-100">
                     <h1 class="text-center"> Subtotal</h2>
+ 
+                    <p class="text-xl font-bold mt-1"> 
+                        ${{"%.2f"|format(subtotal)}}
+                    </p>
 
-                    <h2> 
-                    {% for x in cart%} 
-                        {{ x ["Price"] * x ["Quantity"] }} 
-                    {%endfor%}</h2>
+                    <p class="text-sm italic text-gray-600 mt-2">
+                        Shipping and taxes calculated at checkout
+                    </p>
 
-                    <form method="post" action="/checkout">
-                        <button> Proceed to Checkout </button>
-                    </form>
+
+                    <a href="/checkout">
+                    <button>Go to checkout</button></a>
                 </div>
             
         </div>
