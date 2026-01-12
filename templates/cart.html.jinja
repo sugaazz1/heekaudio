@@ -15,6 +15,7 @@
             </div>
             
         <div class="flex flex-row">
+            {% if cart%}
             <div class="flex flex-col gap-8 p-3">
 
                 {% for x in cart%}
@@ -78,6 +79,20 @@
                     <button>Go to checkout</button></a>
                 </div>
             
+            {%else%}
+
+            <div class="p-10 text-center w-full">
+                <h2 class="text-xl font-semibold">Your cart is empty</h2>
+                <p class="text-gray-500 mt-2">
+                    Looks like you haven’t added anything yet.
+                </p>
+                <a href="/" class="text-blue-600 underline mt-4 inline-block">
+                    Continue shopping
+                </a>
+            </div>
+
+    {% endif %}
+
         </div>
 
         </main>

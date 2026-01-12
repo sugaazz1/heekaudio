@@ -293,3 +293,28 @@ def checkout():
 @app.route("/thank-you")
 def thank_you():
     return render_template("thank-you.html.jinja")
+
+@app.route("/orders")
+def orders():
+    connection = connect_db()
+    cursor = connection.cursor()
+    
+    cursor.execute("""
+        SELECT 
+            `Sale`.`ID`,
+            `Sale`.`Timestamp`,
+            SUM(`SaleCart`.`Quantity`) AS 'Quantity',
+            SUM(`SaleCart`.`Quantity` * `Product`.`Price`) AS 'Total'
+        FROM `Sale`
+        JOIN `SaleCart` ON `SaleCart`.`SaleID` = `Sale`.`ID`
+        JOIN `Product` ON `Product`.`ID` = `SaleCart`.`ProductID`
+        WHERE `UserID` = %s
+        GROUP BY `Sale`.`ID`; 
+    """, (current_user.id))
+    
+    results = cursor.fetchall()
+
+    connection.close()
+
+
+    return render_template("orders.html.jinja", orders=results)
