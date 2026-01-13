@@ -302,7 +302,7 @@ def orders():
     cursor.execute("""
         SELECT 
             `Sale`.`ID`,
-            `Sale`.`Timestamp`,
+            `Sale`.`TimeStamp`,
             SUM(`SaleCart`.`Quantity`) AS 'Quantity',
             SUM(`SaleCart`.`Quantity` * `Product`.`Price`) AS 'Total'
         FROM `Sale`

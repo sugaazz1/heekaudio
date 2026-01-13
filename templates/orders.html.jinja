@@ -8,19 +8,66 @@
     <body>
         {% include "components/navbar.html.jinja"%}
       <main>
-        
+        <h1 class="font-bold text-lg"> Your orders</h1>
+            {%if orders%}
+                <div class="space-y-6">
+                    {%for x in orders%}
+                        <div class="flex flex-col space-x-3 border-2 ml-8 mr-8">
+                            <!-- Image for order-->
 
-        <div class="flex flex-row gap-3 p-2">
-            {%for x in orders%}
-            <div class=" flex flex-col ">
-                <p>{{x["Name"]}} </p>
-            </div>
+                            <div>
+                                <p class="text-lg text-black-500">
+                                    Order #{{ x["ID"] }}
+                                </p>
+                                <p class="text-sm text-black-500">
+                                    Placed on {{ x["TimeStamp"] }}
+                                </p>
+                            </div>
 
 
-            {%endfor%}
-        </div>
+                        
+                            <a href="/product/{{x['ProductID']}}">
+                                <img
+                                src="{{ x['Image'] }}"
+                                alt="{{ x['Name'] }}"
+                                class="w-32 h-32  rounded-xl border border-purple-200">
+                            </a>
+    
+                            <div class="text-right">
+                                <p class="text-sm text-gray-600">
+                                    Items: {{ x["Quantity"] }}
+                                </p>
+                                <p class="text-lg font-bold text-gray-900">
+                                   Total: ${{ "%.2f"|format(x["Total"]) }}
+                                </p>
+                            </div>
 
 
+
+
+
+                        </div>
+
+
+                        
+                    {%endfor%}
+
+
+
+                </div>
+
+
+                {% else %}
+                <div class="text-center py-20">
+                    <p class="text-gray-500 text-lg">
+                        You haven’t placed any orders yet.
+                    </p>
+                    <a href="/"
+                    class="inline-block mt-4 text-blue-600 font-semibold hover:underline">
+                        Start shopping →
+                    </a>
+                </div>
+            {% endif %}
       </main>
         
     </body>

@@ -16,11 +16,11 @@
             
         <div class="flex flex-row">
             {% if cart%}
-            <div class="flex flex-col gap-8 p-3">
-
+            <div class="flex flex-col space-y-4 p-3">
+                <hr>
                 {% for x in cart%}
                 
-                    <div class="flex flex-row space-x-4 w-200 border-2 rounded-xl">
+                    <div class="flex flex-row space-x-4 w-200 ">
                         
                         <div>
                             <a href="/product/{{x['ProductID']}}">
@@ -53,6 +53,7 @@
                         <div class="font-bold"> ${{ x ["Price"] }}</div>
 
                     </div>
+                    <hr>
                 {%endfor%}
                 
                 <span class="text-right text-xl">
