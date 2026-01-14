@@ -20,7 +20,7 @@
                                     Order #{{ x["ID"] }}
                                 </p>
                                 <p class="text-sm text-black-500">
-                                    Placed on {{ x["TimeStamp"] }}
+                                    Placed on {{ x["TimeStamp"].strftime('%-m-%-d-%Y') }}
                                 </p>
                             </div>
 

@@ -103,6 +103,55 @@
 
     </div>
 
+    <div>
+        <h2 class="px-4 text-3xl font-bold text-center text-gray-800">Reviews</h2>
+
+        {%if reviews and current_user.is_authenticated%}
+            <div class="space-y-6"> 
+                {%for x in reviews%}
+                    <div class="bg-white rounded-xl shadow p-6">
+                        
+                        <div class="flex justify-between items-center mb-3">
+                            <p class="text-sm text-gray-500">
+                            {{x ["UserID"]}}
+                            </p>
+                            <p class="text-sm text-gray-500">
+                            {{ x["TimeStamp"].strftime('%m/%d/%Y') }}
+                            </p>
+                        </div>
+
+                        <div>
+                            {%for i in randint(1,5)%}
+                                {% if i <= x["Ratings"] %}
+                                    <span class="text-yellow-400 text-lg">★</span>
+                                {% else %}
+                                    <span class="text-gray-300 text-lg">★</span>
+                                {% endif %} 
+                            {%endfor%}
+                                    
+                        
+                        </div>
+
+                    
+
+                        <div>
+                        {{x ['ProductID']}}
+                        
+                        </div>
+                    </div>
+                {%endfor%}
+            </div>   
+
+        {%else%}
+        <p class="text-center text-gray-500 mb-10">
+            <a href="/login" class="text-blue-600 font-semibold hover:underline">
+                Log in
+            </a>
+            to write a review.
+        </p>
+
+        {%endif%} 
+    </div>
 
     <script>
         function toggleDescription() {

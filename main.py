@@ -87,7 +87,10 @@ def product_page(product_id):
 
     result = cursor.fetchone()
 
-    #cursor.execute("SELECT * FROM `Product` WHERE ` Category` = %s AND `ID` != %s LIMIT 4", (result["Category"], product_id))
+    cursor.execute("""SELECT * FROM `User` 
+                   JOIN `Reviews` ON `Reviews`.`UserID` = `User`.`ID`
+                   WHERE `User`.`ID` = %s; 
+                   """, (current_user.id))
 
     connection.close()
     
@@ -314,7 +317,12 @@ def orders():
     
     results = cursor.fetchall()
 
+
     connection.close()
+
+    
+    
+
 
 
     return render_template("orders.html.jinja", orders=results)
