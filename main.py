@@ -87,17 +87,23 @@ def product_page(product_id):
 
     result = cursor.fetchone()
 
-    cursor.execute("""SELECT * FROM `User` 
-                   JOIN `Reviews` ON `Reviews`.`UserID` = `User`.`ID`
-                   WHERE `User`.`ID` = %s; 
-                   """, (current_user.id))
-
+    cursor.execute("""
+      SELECT * FROM Reviews 
+      JOIN User ON User.ID = Reviews.UserID
+      WHERE ProductID = %s
+      """, (product_id)) 
+    
+    reviews = cursor.fetchall()
+    
     connection.close()
+    
+    average_rating = sum(review["Ratings"] for review in reviews) / len(reviews) if reviews else 0
+    
     
     if result is None:
         abort(404)
 
-    return render_template("product.html.jinja", product=result)
+    return render_template("product.html.jinja", product=result, reviews=reviews, average_rating=average_rating)
 
 @app.route("/product/<product_id>/add_to_cart", methods=["POST"])
 @login_required
@@ -120,6 +126,30 @@ def add_to_cart(product_id):
 
 
     return redirect('/cart')
+
+@app.route("/product/<product_id>/reviews", methods=["POST"])
+@login_required
+def add_review(product_id):
+    #get input vale from form 
+    rating = request.form["rating"]
+    comment = request.form["comment"]
+   
+   
+    connection = connect_db()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+      INSERT INTO Reviews
+             (Rating, Comments, UserID, ProductID)
+       VALUES
+            (%s,%s,%s,%s)
+      """,(rating,comment,current_user.id,product_id))
+    
+
+    connection.close()
+
+    return redirect(f"/product/{product_id}")
+
 
 
 @app.route("/login", methods=["POST","GET"])
