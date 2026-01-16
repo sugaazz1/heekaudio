@@ -140,7 +140,7 @@ def add_review(product_id):
 
     cursor.execute("""
       INSERT INTO Reviews
-             (Rating, Comments, UserID, ProductID)
+             (Ratings, Comments, UserID, ProductID)
        VALUES
             (%s,%s,%s,%s)
       """,(rating,comment,current_user.id,product_id))
@@ -350,9 +350,4 @@ def orders():
 
     connection.close()
 
-    
-    
-
-
-
-    return render_template("orders.html.jinja", orders=results)
+    return render_template("orders.html.jinja", order=results)
