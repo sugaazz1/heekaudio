@@ -61,6 +61,27 @@ def connect_db():
 def index():
     return render_template("homepage.html.jinja")
 
+@app.route("/search")
+def search():
+    query = request.args.get("q", "").strip()
+
+    connection = connect_db()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT *
+        FROM Product
+        WHERE Name LIKE %s
+        OR Description LIKE %s
+    """, (f"%{query}%", f"%{query}%"))
+
+    results = cursor.fetchall()
+    connection.close()
+
+    return render_template("search_results.html.jinja",
+                           query=query,
+                           results=results)
+
 @app.route("/browse")
 def browse():
     connection = connect_db()
