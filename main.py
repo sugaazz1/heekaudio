@@ -61,9 +61,20 @@ def connect_db():
 def index():
     return render_template("homepage.html.jinja")
 
-@app.route("/search")
+@app.route("/search", methods=["GET"])
 def search():
     query = request.args.get("q", "").strip()
+    
+
+    if not query:
+        return render_template(
+            "search_results.html.jinja",
+            query=query,
+            results=[]
+        )
+    
+    words = query.split()
+    
 
     connection = connect_db()
     cursor = connection.cursor()
@@ -76,6 +87,23 @@ def search():
     """, (f"%{query}%", f"%{query}%"))
 
     results = cursor.fetchall()
+
+    if not results:
+        words = query.split()
+
+        for word in words:
+            cursor.execute("""
+                SELECT * FROM Product
+                WHERE Name LIKE %s
+                   OR Description LIKE %s
+            """, (f"%{word}%", f"%{word}%"))
+
+            results = cursor.fetchall()
+
+            if results:
+                break
+
+
     connection.close()
 
     return render_template("search_results.html.jinja",
@@ -344,7 +372,7 @@ def checkout():
 
     return render_template("checkout.html.jinja", cart=results, subtotal=subtotal)
 
-@app.route("/thank-you")
+@app.route("/thank-you", methods=["POST"])
 def thank_you():
     return render_template("thank-you.html.jinja")
 

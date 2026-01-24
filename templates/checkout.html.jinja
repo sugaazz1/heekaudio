@@ -13,55 +13,56 @@
             <div>
                 <h1 class="font-bold text-lg"> Checkout</h1>
             </div>
-            
-        <div class="flex flex-col gap-8 p-3">
 
-            {% for x in Checkout%}
+        {%if cart%}
+            <div class="flex flex-col gap-8 p-3">
             
-                <div class="flex flex-row space-x-4 w-200 border-2 rounded-xl">
+                {% for x in cart%}
+                
+                    <div class="flex flex-row space-x-4 w-200 border-2 rounded-xl">
+                        
+                        <div>
+                            <a href="/product/{{x['ProductID']}}">
+                            <img width="250"
+                            src="{{ x['Image'] }}" 
+                            alt="{{ x['Name'] }}"> </a>
+                                
+                        </div>
+                        
+                        <div> 
+                        <a href="/product/{{x['ProductID']}}">
+                            {{x["Name"]}}
+                            </a>
+                        </div>
+
+                        <div>
+                            <form method="post" action="/cart/{{x ['ProductID' ]}}/update_quantity"> 
+                            <input name ="quantity" type="number" value="{{x ['Quantity']}}" min="1" max="20" class="w-12" >
+
+                            </form>
+                        </div>
+
+                        <div> {{ x ["Price"] * x ["Quantity"] }}</div>
+
+                    </div>
+                {%endfor%}
+                
+                
+            </div>
+            <div class="w-150 p-5 bg-blue-100">
+                    <h1 class="text-center"> Subtotal</h1>
+
+                    <p class="text-xl font-bold mt-1"> 
+                        ${{"%.2f"|format(subtotal)}}
+                    </p>
                     
-                    <div>
-                          <a href="/product/{{x['ProductID']}}">
-                          <img width="250"
-                           src="{{ x['Image'] }}" 
-                           alt="{{ x['Name'] }}"> </a>
-                            
-                    </div>
-                    
-                    <div> 
-                    <a href="/product/{{x['ProductID']}}">
-                        {{x["Name"]}}
-                        </a>
-                    </div>
 
-                    <div>
-                        <form method="post" action="/cart/{{x ['ProductID' ]}}/update_quantity"> 
-                        <input name ="quantity" type="number" value="{{x ['Quantity']}}" min="1" max="20" class="w-12" >
-
-                        </form>
-                    </div>
-
-                    <div> {{ x ["Price"] * x ["Quantity"] }}</div>
-
-                </div>
-            {%endfor%}
-            
-            
-        </div>
-        <div class="w-150 p-5 bg-blue-100">
-                <h1 class="text-center"> Subtotal</h2>
-
-                <p class="text-xl font-bold mt-1"> 
-                    ${{"%.2f"|format(subtotal)}}
-                </p>
-                 
-
-                <form method="post" action="">
-                    <button> Place your Order </button>
-                </form>
+                    <form method="post" action="/thank-you">
+                        <button> Place your Order </button>
+                    </form>
             </div>
 
-        
+        {%endif%}
 
 
        </main>
