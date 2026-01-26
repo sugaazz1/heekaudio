@@ -64,51 +64,70 @@ def index():
 @app.route("/search", methods=["GET"])
 def search():
     query = request.args.get("q", "").strip()
-    
-
-    if not query:
-        return render_template(
-            "search_results.html.jinja",
-            query=query,
-            results=[]
-        )
-    
-    words = query.split()
-    
+    min_price = request.args.get("min_price")
+    max_price = request.args.get("max_price")
+    categories = request.args.getlist("category")
+    brands = request.args.getlist("brand")
+    connectivities = request.args.getlist("connectivity")
 
     connection = connect_db()
-    cursor = connection.cursor()
+    cursor = connection.cursor(pymysql.cursors.DictCursor)
 
-    cursor.execute("""
-        SELECT *
-        FROM Product
-        WHERE Name LIKE %s
-        OR Description LIKE %s
-    """, (f"%{query}%", f"%{query}%"))
+    sql = """
+        SELECT * FROM Product
+        WHERE (Name LIKE %s OR Description LIKE %s)
+    """
+    params = [f"%{query}%", f"%{query}%"]
 
+    if min_price:
+        sql += " AND Price >= %s"
+        params.append(min_price)
+
+    if max_price:
+        sql += " AND Price <= %s"
+        params.append(max_price)
+
+    if categories:
+        placeholders = ", ".join(["%s"] * len(categories))
+        sql += f" AND Category IN ({placeholders})"
+        params.extend(categories)
+
+    if brands:
+        placeholders = ", ".join(["%s"] * len(brands))
+        sql += f" AND Brands IN ({placeholders})"
+        params.extend(brands)
+
+    if connectivities:
+        placeholders = ", ".join(["%s"] * len(connectivities))
+        sql += f" AND Brands IN ({placeholders})"
+        params.extend(connectivities)
+
+    cursor.execute(sql, params)
     results = cursor.fetchall()
 
-    if not results:
-        words = query.split()
+    # Sidebar categories
+    cursor.execute("SELECT DISTINCT Category FROM Product")
+    all_categories = [row["Category"] for row in cursor.fetchall()]
+    
+    cursor.execute("SELECT DISTINCT Brands FROM Product")
+    all_brands = [row["Brands"] for row in cursor.fetchall()]
 
-        for word in words:
-            cursor.execute("""
-                SELECT * FROM Product
-                WHERE Name LIKE %s
-                   OR Description LIKE %s
-            """, (f"%{word}%", f"%{word}%"))
-
-            results = cursor.fetchall()
-
-            if results:
-                break
-
+    cursor.execute("SELECT DISTINCT Connectivity FROM Product")
+    all_connectivities = [row["Connectivity"] for row in cursor.fetchall()]
 
     connection.close()
 
-    return render_template("search_results.html.jinja",
-                           query=query,
-                           results=results)
+    return render_template(
+        "search_results.html.jinja",
+        query=query,
+        results=results,
+        categories=all_categories,
+        selected_categories=categories,
+        brands=all_brands,
+        selected_brands=brands,
+        connectivities=all_connectivities,
+        selected_connectivities=connectivities
+    )
 
 @app.route("/browse")
 def browse():
@@ -131,6 +150,19 @@ def product_page(product_id):
     connection = connect_db()
     cursor = connection.cursor()
     
+    # 1. Fetch the main product
+    cursor.execute("SELECT * FROM `Product` WHERE `ID` = %s", (product_id)) #executes the MySQL commands
+    result = cursor.fetchone() #it saves the executed codes in this variable. fetchone gives 1 item.
+    # 2. Fetch simiilar products based on category field
+    cursor.execute("SELECT * FROM `Product` WHERE `Category` = %s AND `ID` != %s LIMIT 4", (result["Category"], product_id))
+    similar_products = cursor.fetchall()
+
+    #3. Fetch other products, not similar to the category clicked by user
+    cursor.execute("SELECT * FROM `Product` WHERE `Category` != %s ORDER BY RAND() LIMIT 4", (result["Category"],) )
+    other_products = cursor.fetchall()
+
+
+
     cursor.execute("SELECT * FROM `Product` WHERE `ID` = %s", ( product_id) )
 
 
@@ -152,7 +184,7 @@ def product_page(product_id):
     if result is None:
         abort(404)
 
-    return render_template("product.html.jinja", product=result, reviews=reviews, average_rating=average_rating)
+    return render_template("product.html.jinja", product=result, reviews=reviews, average_rating=average_rating, products = similar_products, other_products = other_products)
 
 @app.route("/product/<product_id>/add_to_cart", methods=["POST"])
 @login_required
@@ -354,6 +386,13 @@ def checkout():
         for item in results
     )
 
+    cursor.execute("""
+        SELECT Name, Address
+        FROM User
+        WHERE ID = %s
+    """, (current_user.id,))
+    user = cursor.fetchone()
+
     if request.method == "POST":
         # Create the sale in the database
         cursor.execute("INSERT INTO `Sale` (`UserID`) VALUES (%s)", (current_user.id, ))
@@ -370,7 +409,7 @@ def checkout():
         
     connection.close()
 
-    return render_template("checkout.html.jinja", cart=results, subtotal=subtotal)
+    return render_template("checkout.html.jinja", cart=results, subtotal=subtotal, user=user)
 
 @app.route("/thank-you", methods=["POST"])
 def thank_you():

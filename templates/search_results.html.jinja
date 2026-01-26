@@ -9,29 +9,123 @@
     {% include "components/navbar.html.jinja"%}
 
 
-
-
             <h2 class="text-2xl font-bold mb-6">
                 Search results for "{{ query }}"
             </h2>
+        <div class="flex gap-8 px-6 py-4">
+            <aside class="w-64 bg-gray-100 p-4 sticky top-4 h-fit">
+                <form method="get" action="/search" class="space-y-6">
 
-            {% if results %}
-                <div class="grid grid-cols-3 gap-6">
-                    {% for product in results %}
-                        <div class="bg-white p-4 rounded shadow">
-                            <h3 class="font-semibold">{{ product["Name"] }}</h3>
-                            <p>${{ product["Price"] }}</p>
-                            <a href="/product/{{ product['ID'] }}"
-                            class="text-blue-600 hover:underline">
-                                View product
-                            </a>
-                        </div>
+                <!-- keep search text -->
+                <input type="hidden" name="q" value="{{ query }}">
+
+                <!-- Price -->
+                <div>
+                    <h3 class="font-semibold mb-2">Price</h3>
+                    <div class="flex gap-2">
+                        <input
+                            type="number"
+                            name="min_price"
+                            placeholder="Min"
+                            min="20"
+                            class="w-1/2 border rounded px-2 py-1"
+                            value="{{ request.args.get('min_price', '') }}"
+                        >
+                        <input
+                            type="number"
+                            name="max_price"
+                            placeholder="Max"
+                            min="100"
+                            max="10,000"
+                            class="w-1/2 border rounded px-2 py-1"
+                            value="{{ request.args.get('max_price', '') }}"
+                        >
+                    </div>
+                </div>
+
+                <!-- Category -->
+                <div>
+                    <h3 class="font-semibold mb-2">Category</h3>
+                    <div class="space-y-1 text-sm">
+                    {% for category in categories %}
+                    <label class="flex items-center gap-2 text-sm">
+                        <input
+                            type="checkbox"
+                            name="category"
+                            value="{{ category }}"
+                            {% if category in selected_categories %}checked{% endif %}
+                        >
+                        {{ category }}
+                    </label>
                     {% endfor %}
                 </div>
-            {% else %}
-                <p class="text-gray-500">
-                    No results found.
-                </p>
-            {% endif %}
+
+                <div>
+                    <h3 class="font-semibold mb-2 mt-2">Brands</h3>
+                    <div class="space-y-1 text-sm">
+                        {% for brand in brands %}
+                        <label class="flex items-center gap-2 text-sm">
+                            <input
+                                type="checkbox"
+                                name="brand"
+                                value="{{ brand }}"
+                                {% if brand in selected_brands %}checked{% endif %}
+                                class="accent-blue-600"
+                            >
+                            {{ brand }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="font-semibold mb-2 mt-2">Connectivity</h3>
+                    <div class="space-y-1 text-sm">
+                        {% for connectivity in connectivities %}
+                        <label class="flex items-center gap-2 text-sm">
+                            <input
+                                type="checkbox"
+                                name="brand"
+                                value="{{ brand }}"
+                                {% if connectivity in selected_connectivities %}checked{% endif %}
+                                class="accent-blue-600"
+                            >
+                            {{ connectivity }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+
+                <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                    Apply Filters
+                </button>
+            </form>
+        </aside>
+
+
+            <section class="flex-1">
+                {% if results %}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {% for product in results %}
+                            <div class="bg-white p-4 rounded shadow">
+                                <a href="/product/{{ product['ID'] }}"
+                                    class=" hover:underline">
+                                    <img src="{{ product['Image'] }}" alt="{{ product['Name'] }}" class="w-32 h-32 object-cover mb-2">
+                                    <h3 class="font-semibold">{{ product["Name"] }}</h3>
+                                    <p>${{ product["Price"] }}</p>
+                                
+                                
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500">
+                        No results found.
+                    </p>
+                {% endif %}
+            </section>
+        </div>
     </body>
 </html>

@@ -8,7 +8,7 @@
   <body>
     {% include "components/navbar.html.jinja"%}
 
-       <main>
+       <main class="max-w-7xl mx-auto px-6 py-10">
             <!--Main header for the cart page-->
             <div>
                 <h1 class="font-bold text-lg"> Your Cart</h1>
@@ -64,23 +64,28 @@
                 </span>
             </div >
 
-                <div class="w-150 p-5 bg-blue-100">
-                    <h1 class="text-center"> Subtotal</h2>
- 
-                    <p class="text-xl font-bold mt-1"> 
-                        ${{"%.2f"|format(subtotal)}}
+
+            <aside class="bg-gray-50 p-5 h-fit sticky top-6 ml-5">
+                <div class="bg-blue-100 p-5 rounded-lg">
+                    <h2 class=" font-semibold">Subtotal</h2>
+
+                    <p class="text-xl font-bold mt-1 ">
+                        ${{ "%.2f"|format(subtotal) }}
                     </p>
 
                     <p class="text-sm italic text-gray-600 mt-2">
                         Shipping and taxes calculated at checkout
                     </p>
 
-
-                    <a href="/checkout">
-                    <button>Go to checkout</button></a>
+                    <a href="/checkout" class="block mt-4">
+                        <button class="w-full bg-blue-600 text-white py-2 rounded">
+                            Go to checkout
+                        </button>
+                    </a>
                 </div>
-            
-            {%else%}
+            </aside>
+
+        {%else%}
 
             <div class="p-10 text-center w-full">
                 <h2 class="text-xl font-semibold">Your cart is empty</h2>
